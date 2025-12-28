@@ -1,0 +1,805 @@
+\documentclass[8pt,landscape]{article}
+\usepackage[a4paper, margin=0.2in]{geometry}
+\usepackage{multicol}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage{xcolor}
+\usepackage{enumitem}
+\usepackage{hyperref}
+
+% Define colors matching the template
+\definecolor{titlecolor}{RGB}{0,51,102}        % Dark blue for main titles
+\definecolor{subtitlecolor}{RGB}{153,0,76}     % Dark magenta for subtitles
+\definecolor{lemmacolor}{RGB}{0,102,51}        % Dark green for lemma numbers
+\definecolor{boxcolor}{RGB}{240,240,240}       % Light gray for background boxes
+
+% Compact list settings
+\setlist{nosep}
+
+% Redefine section to use color and save space
+\usepackage{titlesec}
+\titleformat{\section}
+{\normalfont\large\bfseries\color{titlecolor}}
+{\thesection}{0em}{}
+\titlespacing*{\section}{0pt}{2pt}{1pt}
+
+\titleformat{\subsection}
+{\normalfont\normalsize\bfseries\color{subtitlecolor}}
+{\thesubsection}{0em}{}
+\titlespacing*{\subsection}{0pt}{1pt}{0pt}
+
+% Custom commands
+\newcommand{\lem}[1]{\textbf{\color{lemmacolor}#1}}
+\newcommand{\thm}[1]{\textbf{\color{subtitlecolor}#1}}
+\newcommand{\defn}[1]{\textbf{#1}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+\DeclareMathOperator{\Span}{Span}
+\DeclareMathOperator{\rank}{rank}
+\DeclareMathOperator{\trace}{Tr}
+\DeclareMathOperator{\diag}{diag}
+
+\pagestyle{empty}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{1pt}
+
+\begin{document}
+	\footnotesize
+	\begin{multicols*}{3}
+		
+		% ================= VECTORS & MATRICES =================
+		
+		\section*{1. Vectors and Dot Products}
+		
+		\subsection*{Definitions}
+		\defn{Vector} $v \in \R^m$: sequence of $m$ real numbers (column).
+		\defn{Linear Combination}: $\sum_{j=1}^n \lambda_j v_j = \lambda_1 v_1 + \dots + \lambda_n v_n$.
+		\begin{itemize}
+			\item \defn{Affine}: $\sum \lambda_i = 1$.
+			\item \defn{Conic}: $\lambda_i \ge 0$.
+			\item \defn{Convex}: $\sum \lambda_i = 1$ and $\lambda_i \ge 0$.
+		\end{itemize}
+		
+		\subsection*{Scalar Product \& Norms}
+		\defn{Scalar Product}: $v \cdot w = v^\top w = \sum_{i=1}^m v_i w_i$.
+		\defn{Euclidean Norm}: $\|v\| = \sqrt{v \cdot v} = \sqrt{\sum v_i^2}$.
+		\defn{p-Norm}: $\|v\|_p = (\sum |v_i|^p)^{1/p}$.
+		\defn{Infinity Norm}: $\|v\|_\infty = \max_i |v_i|$.
+		
+		\lem{1.12 Cauchy-Schwarz}: $|v^\top w| \le \|v\| \|w\|$. Equality iff $v = \lambda w$.
+		\lem{1.17 Triangle Inequality}: $\|v+w\| \le \|v\| + \|w\|$.
+		
+		\subsection*{Angles and Orthogonality}
+		\defn{Angle} $\alpha$: $\cos(\alpha) = \frac{v^\top w}{\|v\|\|w\|}$.
+		\defn{Orthogonal} ($v \perp w$): $v^\top w = 0$.
+		\defn{Orthonormal}: vectors $q_1, \dots, q_n$ are orthogonal and $\|q_i\|=1$.
+		$$\delta_{ij} = q_i^\top q_j = \begin{cases} 1 & i=j \\ 0 & i \neq j \end{cases} \quad \text{(Kronecker delta)}$$
+		
+		\subsection*{Linear (In)dependence}
+		\defn{Linear Independence}: $\sum \alpha_i v_i = 0 \implies \text{all } \alpha_i = 0$.
+		\defn{Span}: $\Span(v_1, \dots, v_k) = \{ \sum \alpha_i v_i : \alpha_i \in \R \}$.
+		
+		\lem{1.22 Alt. Def. of Linear Dependence}: Vectors $v_1, \dots, v_n$ are linearly dependent iff (i) there exists nontrivial combination $\sum \alpha_i v_i = 0$, or (ii) one is a linear combination of others, or (iii) one is a linear combination of previous ones.
+		
+		\lem{1.24}: If $v_1, \dots, v_n$ are independent and $v \notin \Span(v_1, \dots, v_n)$, then $v_1, \dots, v_n, v$ are independent.
+		
+		\lem{1.26}: If $v$ is a linear combination of $v_1, \dots, v_n$, and each $v_i$ is a linear combination of $w_1, \dots, w_k$, then $v$ is a linear combination of $w_1, \dots, w_k$.
+		
+		\lem{1.27}: If $v_k$ is a linear combination of other vectors $v_1, \dots, v_{k-1}, v_{k+1}, \dots, v_n$, then $\Span(v_1, \dots, v_n) = \Span(v_1, \dots, v_{k-1}, v_{k+1}, \dots, v_n)$.
+		
+		\lem{1.28 KEY}: The span of $m$ linearly independent vectors in $\R^m$ is $\R^m$.
+		
+		\section*{2. Matrices and Linear Transformations}
+		
+		\subsection*{Matrix Operations}
+		\defn{Matrix} $A \in \R^{m \times n}$: $m$ rows, $n$ columns.
+		\defn{Transpose} $A^\top$: $(A^\top)_{ij} = A_{ji}$. Rules: $(AB)^\top = B^\top A^\top$.
+		\defn{Symmetric}: $A = A^\top$.
+		\defn{Product} $AB$: $(AB)_{ij} = (\text{row } i \text{ of } A) \cdot (\text{col } j \text{ of } B)$.
+		Requires inner dimensions match: $(m \times n) \times (n \times p) = (m \times p)$.
+		
+		\subsection*{Fundamental Spaces}
+		\defn{Column Space} $C(A) \subseteq \R^m$: Span of columns.
+		\defn{Row Space} $R(A) = C(A^\top) \subseteq \R^n$: Span of rows.
+		\defn{Nullspace} $N(A) \subseteq \R^n$: $\{x : Ax=0\}$.
+		\defn{Rank} $\rank(A)$: Number of independent columns = number of independent rows.
+		
+		\lem{2.15 Rank-1 Matrices}: $\rank(A) = 1$ iff $A = uv^\top$ for some $u \in \R^m, v \in \R^n$ (both nonzero).
+		
+		\subsection*{Linear Transformations}
+		\defn{Linear Map} $T: \R^n \to \R^m$ is linear if:
+		1. $T(x+y) = T(x) + T(y)$
+		2. $T(\lambda x) = \lambda T(x)$
+		
+		\lem{2.19 Linearity of Matrix Transformations}: $T_A(x) = Ax$ is linear.
+		
+		\lem{2.23}: $T: \R^n \to \R^m$ is linear iff $T(\lambda x + \mu y) = \lambda T(x) + \mu T(y)$ for all $\lambda, \mu \in \R$ and $x, y \in \R^n$.
+		
+		\thm{2.26 FUNDAMENTAL}: Every linear map $T: \R^n \to \R^m$ has a unique matrix representation $T(x) = Ax$ where columns of $A$ are $T(e_1), \dots, T(e_n)$.
+		
+		\begin{itemize}
+			\item \defn{Kernel}: $\ker(T) = \{x : T(x) = 0\} = N(A)$.
+			\item \defn{Image}: $\text{Im}(T) = \{T(x) : x \in \R^n\} = C(A)$.
+		\end{itemize}
+		
+		\subsection*{Matrix Multiplication \& Composition}
+		\lem{2.34}: Composition of matrix transformations: $T_A \circ T_B = T_{AB}$.
+		
+		\lem{2.35}: Matrix of composition is product of matrices.
+		
+		Properties: $(AB)C = A(BC)$, $A(B+C) = AB + AC$, $(A+B)C = AC + BC$.
+		
+		\subsection*{Matrix Inversion}
+		\defn{Invertible}: Square matrix $A$ is invertible (non-singular) if $\exists B$ s.t. $AB = BA = I$.
+		
+		\lem{2.50}: Wide matrix transformations ($n > m$) are not injective.
+		
+		\lem{2.51}: Tall matrix transformations ($m > n$) are not surjective.
+		
+		\lem{2.53/2.56 KEY}: $A \in \R^{n \times n}$ invertible $\iff$ cols linearly independent $\iff \det(A) \neq 0 \iff \rank(A)=n \iff T_A$ is bijective.
+		
+		\lem{2.54}: If $BA = I$ (square matrices), then $AB = I$.
+		
+		Properties: $(AB)^{-1} = B^{-1} A^{-1}$, $(A^\top)^{-1} = (A^{-1})^\top$.
+		
+		% ================= SOLVING LINEAR EQUATIONS =================
+		
+		\section*{3. Systems of Linear Equations}
+		
+		System $Ax = b$.
+		\begin{itemize}
+			\item \textbf{Solvable}: $b \in C(A)$.
+			\item \textbf{Unique solution}: $N(A) = \{0\}$ (independent cols).
+			\item \textbf{General Solution}: $x = x_p + x_h$, where $Ax_p = b$ (particular) and $Ax_h = 0$ (homogeneous).
+		\end{itemize}
+		
+		\subsection*{Gauss Elimination}
+		\defn{Gauss Elimination}: Transform $A$ to Row Echelon Form (REF) using row operations (swap, scale, add).
+		\defn{Rank} $r$: Number of pivots in REF.
+		\defn{Free variables}: $n-r$ variables corresponding to non-pivot columns.
+		
+		\lem{3.2 Invariance of Solutions}: If $M$ is invertible, $Ax = b$ and $MAx = Mb$ have same solutions.
+		
+		\lem{3.3 Invariance of Nullspace}: $N(MA) = N(A)$ if $M$ invertible.
+		
+		\lem{3.4 Invariance of Linear Independence}: Cols of $MA$ are independent iff cols of $A$ are independent.
+		
+		\lem{3.5 Invariance of Row Space}: $C(A^\top) = C((MA)^\top)$ if $M$ invertible.
+		
+		\lem{3.6 Invariance of Rank}: $\rank(MA) = \rank(A)$ if $M$ invertible.
+		
+		\thm{3.7}: $m \times m$ system $Ax = b$ has unique solution iff Gauss elimination succeeds (finds $m$ pivots).
+		
+		\thm{3.8}: Gauss elimination solves $Ax = b$ in $O(m^2 n)$ time.
+		
+		\subsection*{Gauss-Jordan Elimination}
+		\defn{Reduced Row Echelon Form (RREF)}: Matrix $R$ where:
+		1. In REF form
+		2. Pivots are 1
+		3. Entries above pivots are 0
+		
+		\lem{3.14}: Matrix $R$ in $\text{RREF}(j_1, \dots, j_r)$ has independent columns $j_1, \dots, j_r$ and dependent other columns.
+		
+		\thm{3.17}: Gauss-Jordan output: $(R, j_1, \dots, j_r, M)$ where $R = MA$ is the RREF of $A$.
+		
+		\thm{3.18 Uniqueness}: RREF of $A$ is unique. $A$ invertible iff $R = I$.
+		
+		\thm{3.20}: Gauss-Jordan solves $Ax = b$ and computes $A^{-1}$ (if invertible) in $O(mn^2)$ time.
+		
+		% ================= VECTOR SPACES =================
+		
+		\section*{4. Vector Spaces}
+		
+		\subsection*{Vector Space Axioms}
+		Set $V$ with addition ($+$) and scalar multiplication ($\cdot$) satisfying closure, commutativity, associativity, zero element, inverse, distributivity.
+		Examples: $\R^n$, polynomials $\R[x]$, matrices $\R^{m \times n}$.
+		
+		\defn{Subspace} $U \subseteq V$:
+		1. $0 \in U$.
+		2. Closed under addition: $u, v \in U \implies u+v \in U$.
+		3. Closed under scalar mult: $u \in U \implies \lambda u \in U$.
+		
+		\lem{4.9}: Every subspace contains the zero vector.
+		
+		\lem{4.14}: Subspaces are vector spaces (inherit the structure).
+		
+		\lem{4.16}: Vector spaces are closed under linear combinations.
+		
+		\subsection*{Linear Independence \& Basis}
+		\defn{Basis}: A set of vectors that is (1) linearly independent and (2) spans $V$.
+		\defn{Dimension} $\dim(V)$: Number of vectors in a basis (unique).
+		
+		\thm{4.22}: If $G$ spans $V$ and $F \subseteq V$ is independent, then $|F| \le |G|$.
+		
+		\thm{4.23 Steinitz Exchange Lemma}: If independent set $F$ has $k$ elements and spanning set $G$ has $n$ elements, can exchange elements to get spanning set containing all of $F$.
+		
+		\thm{4.29 FUNDAMENTAL}: A basis writes each vector uniquely as a linear combination.
+		
+		\lem{4.30}: Fewer than $\dim(V)$ vectors cannot span $V$.
+		
+		\subsection*{Fundamental Subspaces of $A \in \R^{m \times n}$}
+		1. \defn{Column Space} $C(A) \subseteq \R^m$: Span of columns. Dimension = $r$ (rank).
+		2. \defn{Row Space} $R(A) = C(A^\top) \subseteq \R^n$: Span of rows. Dimension = $r$.
+		3. \defn{Nullspace} $N(A) \subseteq \R^n$: $\{x : Ax=0\}$. Dimension = $n-r$.
+		4. \defn{Left Nullspace} $N(A^\top) \subseteq \R^m$: $\{y : A^\top y = 0\}$. Dimension = $m-r$.
+		
+		\thm{4.31}: Columns $j_1, \dots, j_r$ of $A$ (pivot columns in RREF) form a basis of $C(A)$.
+		
+		\thm{4.32}: First $r$ rows of RREF form a basis of $C(A^\top)$.
+		
+		\thm{4.33 Rank-Nullity}: $\dim(C(A)) + \dim(N(A)) = n \implies r + (n-r) = n$.
+		
+		\thm{4.36}: Special solutions (from free variables = unit vectors) form a basis of $N(A)$.
+		
+		\subsection*{Solution Spaces}
+		\thm{4.38}: Solution space of $Ax = b$ is $x_p + N(A)$ (particular solution + nullspace).
+		
+		\thm{4.39}: If $Ax = b$ has a solution, solution space has dimension $n - r$.
+		
+		\thm{4.40}: If $\rank(A) = m$, then $Ax = b$ is solvable for all $b \in \R^m$.
+		
+		\section*{5. Orthogonality \& Projections}
+		
+		\subsection*{Orthogonal Subspaces}
+		$V \perp W$ if $v^\top w = 0$ for all $v \in V, w \in W$.
+		\defn{Orthogonal Complement} $V^\perp = \{x : x^\top v = 0, \forall v \in V\}$.
+		
+		\lem{5.1.2}: V and W orthogonal iff basis vectors pairwise orthogonal.
+		
+		\lem{5.1.3}: Union of bases of orthogonal subspaces is linearly independent.
+		
+		\thm{5.1.6 FUNDAMENTAL - Four Subspaces}:
+		\begin{itemize}
+			\item $N(A) = C(A^\top)^\perp = R(A)^\perp$.
+			\item $C(A) = N(A^\top)^\perp$.
+		\end{itemize}
+		
+		\thm{5.1.7}: For orthogonal $V, W \subseteq \R^n$, TFAE:
+		(i) $W = V^\perp$, (ii) $\dim(V) + \dim(W) = n$, (iii) Every $u \in \R^n$ uniquely $u = v + w$.
+		
+		\lem{5.1.8}: $V = (V^\perp)^\perp$.
+		
+		\lem{5.1.10 KEY}: $N(A) = N(A^\top A)$ and $C(A^\top) = C(A^\top A)$.
+		
+		\subsection*{Projections}
+		Projection of $b$ onto subspace $S$: $p = \text{proj}_S(b)$ is the point in $S$ closest to $b$.
+		Error $e = b - p$ is orthogonal to $S$ ($e \in S^\perp$).
+		
+		\lem{5.2.2}: Projection onto line $a$: $p = \frac{aa^\top}{a^\top a}b$.
+		
+		\lem{5.2.3}: Projection onto $C(A)$ satisfies normal equations $A^\top A\hat{x} = A^\top b$.
+		
+		\lem{5.2.4}: $A^\top A$ invertible iff $A$ has independent columns.
+		
+		\thm{5.2.5 Projection Matrix}: $P = A(A^\top A)^{-1} A^\top$.
+		Properties of $P$: Symmetric ($P=P^\top$) and Idempotent ($P^2=P$).
+		Projection onto $S^\perp$: $P_{S^\perp} = I - P_S$.
+		
+		\section*{6. Least Squares}
+		
+		Problem: Solve $Ax=b$ where no solution exists.
+		Goal: Minimize error $\|Ax - b\|^2$.
+		\defn{Normal Equations}: $A^\top A \hat{x} = A^\top b$.
+		Solution: $\hat{x} = (A^\top A)^{-1} A^\top b$ (if cols independent).
+		Projection: $p = A\hat{x}$ is projection of $b$ onto $C(A)$.
+		
+		\lem{5.1.10} $N(A^\top A) = N(A)$ and $C(A^\top A) = C(A^\top)$.
+		If columns of $A$ independent, $A^\top A$ is invertible.
+		
+		\subsection*{Solution Spaces}
+		\lem{6.2.1}: For $x,y \in C(A^\top)$, $Ax = Ay \iff x = y$.
+		
+		\thm{6.2.2 Solution Space Structure}: If $\{x: Ax=b\} \neq \emptyset$, then $\{x: Ax=b\} = x_1 + N(A)$ where $x_1 \in C(A^\top)$ is unique with $Ax_1 = b$.
+		
+		\thm{6.2.4 Infeasibility Certificate}: $\{x: Ax=b\} = \emptyset \iff \{z: A^\top z=0, b^\top z=1\} \neq \emptyset$.
+		
+		\section*{7. Gram-Schmidt \& QR}
+		
+		\defn{Gram-Schmidt Process}: Converts basis $a_1, \dots, a_n$ into orthonormal basis $q_1, \dots, q_n$.
+		1. $q_1 = a_1 / \|a_1\|$.
+		2. $\tilde{q}_k = a_k - \sum_{i=1}^{k-1} (a_k^\top q_i)q_i$.
+		3. $q_k = \tilde{q}_k / \|\tilde{q}_k\|$.
+		
+		\thm{6.3.9 Correctness}: Gram-Schmidt produces orthonormal basis for $\Span(a_1, \dots, a_n)$.
+		
+		\defn{6.3.10 QR Decomposition}: $A = QR$.
+		\begin{itemize}
+			\item $Q$: Matrix with orthonormal columns ($Q^\top Q = I$).
+			\item $R$: Upper triangular matrix.
+		\end{itemize}
+		
+		\lem{6.3.11}: $R$ is upper triangular, invertible, and $QQ^\top A = A$.
+		
+		Least Squares with QR: $R \hat{x} = Q^\top b$ (solved by back-substitution).
+		
+		\section*{8. Pseudoinverse ($A^\dagger$)}
+		
+		Generalizes inverse for non-square/singular matrices.
+		
+		\defn{6.4.1 Full Col Rank} ($r=n$): $A^\dagger = (A^\top A)^{-1} A^\top$. 
+		\textbf{Prop 6.4.2}: Left inverse ($A^\dagger A = I$).
+		
+		\defn{6.4.3 Full Row Rank} ($r=m$): $A^\dagger = A^\top (A A^\top)^{-1}$. 
+		\textbf{Lem 6.4.4}: Right inverse ($A A^\dagger = I$).
+		
+		\defn{6.4.7 General Case}: For $A = CR$ decomposition, $A^\dagger = R^\top(C^\top AR^\top)^{-1}C^\top$.
+		
+		\lem{6.4.5}: Min norm solution to $Ax=b$ is in $C(A^\top)$.
+		
+		\lem{6.4.8}: $x_{best} = A^\dagger b$ solves $\min \|x\|^2$ subject to $A^\top Ax = A^\top b$.
+		
+		\thm{6.4.10 Properties}:
+		\begin{itemize}
+			\item $AA^\dagger A = A$ and $A^\dagger AA^\dagger = A^\dagger$
+			\item $(A^\top)^\dagger = (A^\dagger)^\top$
+			\item $AA^\dagger$ projects onto $C(A)$
+			\item $A^\dagger A$ projects onto $C(A^\top)$
+		\end{itemize}
+		
+		% ================= DETERMINANTS & EIGENVALUES =================
+		
+		\section*{9. Determinants}
+		
+		\defn{Definition}: $\det(A) = \sum_{\sigma \in S_n} \text{sgn}(\sigma) \prod_{i=1}^n A_{i, \sigma(i)}$.
+		\defn{2x2}: $\det \begin{pmatrix} a & b \\ c & d \end{pmatrix} = ad-bc$.
+		
+		\thm{7.2.6 FUNDAMENTAL Properties}:
+		\begin{itemize}
+			\item $\det(AB) = \det(A)\det(B)$.
+			\item $\det(A^\top) = \det(A)$ (Thm 7.2.5).
+			\item $\det(A^{-1}) = 1/\det(A)$.
+			\item $A$ invertible $\iff \det(A) \neq 0$.
+			\item Triangular matrix: $\det(T) = \prod T_{ii}$.
+			\item Swapping rows: $\det(PA) = -\det(A)$ (Prop 7.3.6).
+			\item Adding scaled row to another does not change $\det$.
+		\end{itemize}
+		
+		\textbf{Prop 7.3.2} Cofactor Expansion: $\det(A) = \sum_{j=1}^n A_{ij} C_{ij}$ where $C_{ij} = (-1)^{i+j} \det(M_{ij})$.
+		
+		\textbf{Prop 7.3.3}: $A^{-1} = \frac{1}{\det(A)} C^\top$ ($C$ is cofactor matrix).
+		
+		\textbf{Prop 7.3.5} Cramer's Rule: $x_i = \frac{\det(A_i)}{\det(A)}$ where $A_i$ replaces col $i$ with $b$.
+		
+		\textbf{Prop 7.3.7}: Determinant is linear in each row/column.
+		
+		\section*{10. Complex Numbers}
+		
+		$z = a + bi \in \C$. $i^2 = -1$.
+		\defn{Conjugate}: $\bar{z} = a - bi$.
+		\defn{Modulus}: $|z|^2 = z \bar{z} = a^2 + b^2$.
+		\defn{Polar}: $z = r e^{i\theta} = r(\cos \theta + i \sin \theta)$.
+		
+		\thm{8.1.2 Fundamental Thm of Algebra}: Degree $n$ polynomial has $n$ complex roots (counting multiplicity).
+		
+		\textbf{Cor 8.1.3}: $P(z) = \alpha_n(z-\lambda_1)\cdots(z-\lambda_n)$.
+		
+		\section*{11. Eigenvalues and Eigenvectors}
+		
+		\defn{Definition}: $Av = \lambda v$ with $v \neq 0$.
+		\begin{itemize}
+			\item $\lambda \in \C$: Eigenvalue.
+			\item $v \in \C^n$: Eigenvector.
+		\end{itemize}
+		
+		\lem{8.2.3}: $\lambda$ is eigenvalue iff $\det(A - \lambda I) = 0$.
+		
+		\defn{Computation}:
+		1. Solve $\det(A - \lambda I) = 0$ (Characteristic Polynomial $p_A(\lambda)$) to find $\lambda$.
+		2. Find $v \in N(A - \lambda I)$ (Eigenspace).
+		
+		\thm{8.2.5}: Every matrix has an eigenvalue (possibly complex).
+		
+		\lem{8.2.8}: For real $A$, if $(\lambda,v)$ is eigenpair, so is $(\bar{\lambda},\bar{v})$.
+		
+		\textbf{Prop 8.2.7}: Orthogonal matrices: $|\lambda| = 1$.
+		
+		\textbf{Prop 8.3.1} Powers and Inverses:
+		\begin{itemize}
+			\item Eigenvalues of $A^k$ are $\lambda^k$.
+			\item If $A$ invertible, eigenvalues of $A^{-1}$ are $1/\lambda$.
+		\end{itemize}
+		
+		\lem{8.3.2 KEY}: Eigenvectors for distinct eigenvalues are linearly independent.
+		
+		\thm{8.3.3}: $n$ distinct eigenvalues $\implies$ basis of eigenvectors.
+		
+		\lem{8.3.5}: $A$ and $A^\top$ have same eigenvalues.
+		
+		\lem{8.3.6 IMPORTANT}:
+		\begin{itemize}
+			\item $\trace(A) = \sum A_{ii} = \sum \lambda_i$.
+			\item $\det(A) = \prod \lambda_i$.
+		\end{itemize}
+		
+		\lem{8.3.7}: $\trace(AB) = \trace(BA)$.
+		
+		\defn{Multiplicities}:
+		\begin{itemize}
+			\item \defn{Algebraic} ($m_\lambda$): multiplicity of root in $p_A(\lambda)$.
+			\item \defn{Geometric} ($d_\lambda$): $\dim(N(A-\lambda I))$.
+			\item Always $1 \le d_\lambda \le m_\lambda$.
+		\end{itemize}
+		
+		\defn{Diagonalization}:
+		Matrix $A$ is diagonalizable if $A = V \Lambda V^{-1}$.
+		\begin{itemize}
+			\item $\Lambda$: Diagonal matrix of eigenvalues.
+			\item $V$: Matrix of eigenvectors (columns).
+		\end{itemize}
+		
+		\thm{9.1.1 FUNDAMENTAL}: $A$ has basis of eigenvectors $\implies A = V\Lambda V^{-1}$.
+		
+		$A$ is diagonalizable $\iff$ $A$ has $n$ linearly independent eigenvectors $\iff$ geometric mult = algebraic mult for all $\lambda$ (Lem 9.1.11).
+		
+		\textbf{Prop 9.1.6}: Projection matrices have eigenvalues 0 and 1 with complete eigenvectors.
+		
+		\textbf{Prop 9.1.8}: Similar matrices ($B = S^{-1}AS$) have same eigenvalues.
+		
+		Note: $n$ distinct eigenvalues $\implies$ diagonalizable.
+		
+		\defn{Matrix Powers}: $A^k = V \Lambda^k V^{-1}$.
+		
+		% ================= SPECTRAL THM & SVD =================
+		
+		\section*{12. Symmetric Matrices (Spectral Thm)}
+		
+		Let $A = A^\top$ (Real Symmetric Matrix).
+		
+		\thm{9.2.1 SPECTRAL THEOREM - MOST IMPORTANT}:
+		1. All eigenvalues of $A$ are real ($\lambda \in \R$) (Lem 9.2.8).
+		2. Eigenvectors of distinct eigenvalues are orthogonal (Lem 9.2.7).
+		3. $A$ has a complete set of orthonormal eigenvectors.
+		4. $A$ is orthogonally diagonalizable: $A = V \Lambda V^\top$ ($V$ orthogonal, $V^\top = V^{-1}$).
+		
+		\textbf{Cor 9.2.2}: For symmetric $A = V\Lambda V^\top$ with $V$ orthogonal.
+		
+		\textbf{Prop 9.2.6} Spectral Decomposition: $A = \sum_{i=1}^n \lambda_i v_i v_i^\top$.
+		
+		\textbf{Cor 9.2.4}: Rank = number of non-zero eigenvalues (for symmetric).
+		
+		\subsection*{Positive Definite Matrices}
+		Symmetric $A$ is \defn{Positive Definite} (PD) if $x^\top A x > 0$ for all $x \neq 0$.
+		\defn{Positive Semidefinite} (PSD) if $x^\top A x \ge 0$.
+		
+		\textbf{Prop 9.2.12}: $A$ is PSD $\iff x^\top Ax \geq 0$ for all $x$.
+		
+		Tests for PD:
+		\begin{itemize}
+			\item All eigenvalues $\lambda_i > 0$.
+			\item All pivots > 0.
+			\item All upper-left subdeterminants > 0.
+		\end{itemize}
+		Properties:
+		\begin{itemize}
+			\item $A^\top A$ is always PSD.
+			\item \textbf{Prop 9.2.16} Cholesky: If $A$ is PSD, $A = R^\top R$ ($R$ upper triangular).
+		\end{itemize}
+		
+		\textbf{Prop 9.2.10} Rayleigh Quotient: $R(x) = \frac{x^\top A x}{x^\top x}$.
+		$\lambda_{\min} \le R(x) \le \lambda_{\max}$.
+		
+		\textbf{Prop 9.2.15 KEY}: Non-zero eigenvalues of $A^\top A$ and $AA^\top$ are the same (both PSD).
+		
+		\section*{13. Singular Value Decomposition (SVD)}
+		
+		\thm{9.3.3 SVD - FUNDAMENTAL}: For any matrix $A \in \R^{m \times n}$:
+		$$ A = U \Sigma V^\top $$
+		\begin{itemize}
+			\item $U \in \R^{m \times m}$: Orthogonal ($U^\top U = I$). Cols = Left singular vectors (eigenvectors of $AA^\top$).
+			\item $V \in \R^{n \times n}$: Orthogonal ($V^\top V = I$). Cols = Right singular vectors (eigenvectors of $A^\top A$).
+			\item $\Sigma \in \R^{m \times n}$: Diagonal matrix of \defn{Singular Values} $\sigma_i$.
+		\end{itemize}
+		
+		\defn{Singular Values} $\sigma_i$:
+		\begin{itemize}
+			\item $\sigma_i = \sqrt{\lambda_i(A^\top A)}$ (Prop 9.2.15).
+			\item Ordered $\sigma_1 \ge \sigma_2 \ge \dots \ge \sigma_r > 0$.
+			\item $\rank(A) = r$ (number of non-zero singular values).
+		\end{itemize}
+		
+		\defn{Compact SVD}: $A = U_r \Sigma_r V_r^\top$ (using only rank $r$).
+		
+		\textbf{Prop 9.3.4} Rank-1 Expansion: $A = \sum_{i=1}^r \sigma_i u_i v_i^\top$.
+		
+		\defn{Pseudoinverse via SVD}:
+		$$ A^\dagger = V \Sigma^\dagger U^\top $$
+		where $\Sigma^\dagger$ is formed by taking reciprocals of non-zero $\sigma_i$ and transposing.
+		
+		\subsection*{Matrix Norms}
+		\textbf{Prop 10.0.3}:
+		\begin{itemize}
+			\item Frobenius: $\|A\|_F = \sqrt{\trace(A^\top A)} = \sqrt{\sum \sigma_i^2}$.
+			\item Spectral (Operator): $\|A\|_{op} = \max_{\|x\|=1} \|Ax\| = \sigma_1$ (largest singular value).
+			\item $\|A\|_{op} \leq \|A\|_F \leq \sqrt{\min\{m,n\}}\|A\|_{op}$.
+		\end{itemize}
+		
+		\section*{14. Skew-Symmetric \& PSD Matrices}
+		
+		\subsection*{Skew-Symmetric Matrices}
+		\defn{Definition}: $A \in \R^{m \times m}$ is skew-symmetric if $A^\top = -A$.
+		\textbf{Component-wise}: $A_{ij} = -A_{ji}$.
+		
+		\thm{Properties}:
+		\begin{itemize}
+			\item \textbf{Diagonal}: All $A_{ii} = 0$ (since $A_{ii} = -A_{ii}$) [Sol 2].
+			\item \textbf{Quadratic Form}: $x^\top A x = 0$ for all $x \in \R^m$.
+			\item \textbf{Determinant}: If $m$ is \textbf{odd}, $\det(A) = 0$ [Sol 10].
+			\item \textbf{Rank}: Always even.
+			\item \textbf{Eigenvalues}: Purely imaginary ($0$ or $\pm i\lambda$).
+			\item \textbf{Intersection}: Symmetric $\cap$ Skew-Symmetric $= \{0\}$ [Sol 2].
+		\end{itemize}
+		
+		\thm{Vector Space Structure} [Sol 6]:
+		\begin{itemize}
+			\item $\mathcal{S}_m$ is a subspace of $\R^{m \times m}$.
+			\item \textbf{Dimension}: $\frac{m(m-1)}{2}$.
+			\item \textbf{Basis}: $\{E_{ij} - E_{ji} \mid 1 \le j < i \le m\}$.
+		\end{itemize}
+		
+		\subsection*{Positive Definite (PD) \& Semi-Definite (PSD)}
+		\defn{Definition}: Symmetric $A$ is PSD if $x^\top A x \ge 0$ for all $x$.
+		\defn{PD}: Symmetric $A$ is PD if $x^\top A x > 0$ for all $x \neq 0$.
+		
+		\thm{Key Properties} [Sol 13]:
+		\begin{itemize}
+			\item \textbf{Eigenvalues}: $\lambda_i \ge 0$ (PSD), $\lambda_i > 0$ (PD).
+			\item \textbf{Diagonal}: $A_{ii} \ge 0$ (PSD), $A_{ii} > 0$ (PD).
+			\item \textbf{Trace}: $\trace(A) \ge 0$ (Sum of eigenvalues).
+			\item \textbf{Invertibility}: PD matrices are always invertible.
+			\item \textbf{Sums}: If $A, B$ are PSD, then $A+B$ is PSD.
+			\item \textbf{Inequality}: $\lambda_{\min}(A+B) \ge \lambda_{\min}(A) + \lambda_{\min}(B)$.
+		\end{itemize}
+		
+		\thm{Relations between Skew PSD}:
+		\begin{itemize}
+			\item \textbf{Gram Matrix}: $A^\top A$ is always PSD.
+			\item \textbf{From Skew}: If $S$ is Skew-Symmetric ($S^\top = -S$), then $-S^2$ is symmetric and \textbf{PSD}.
+			\item \textit{Why}: $x^\top (-S^2) x = x^\top S^\top S x = \|Sx\|^2 \ge 0$.
+		\end{itemize}
+		
+		\section*{Quick Reference: Dimensions}
+		Let $A$ be $m \times n$ of rank $r$.
+		\begin{center}
+			\begin{tabular}{|c|c|c|}
+				\hline
+				\textbf{Space} & \textbf{Subspace of} & \textbf{Dim} \\
+				\hline
+				$C(A)$ & $\R^m$ & $r$ \\
+				$N(A)$ & $\R^n$ & $n-r$ \\
+				$C(A^\top)$ & $\R^n$ & $r$ \\
+				$N(A^\top)$ & $\R^m$ & $m-r$ \\
+				\hline
+			\end{tabular}
+		\end{center}
+		
+		% ================= EXERCISES & INSIGHTS =================
+		
+		\section*{Key Insights from Exercises (1-13)}
+		
+		\subsection*{1. Rank \& Nullspace Tricky Cases}
+		\defn{Rank of Sum Matrix} (Sol 2):
+		Matrix $A$ with entries $A_{ij} = i+j$ has $\rank(A) = 2$ (for $m \ge 2$).
+		Cols are linear combinations of $(1, \dots, 1)^\top$ and $(1, 2, \dots, m)^\top$.
+		
+		\defn{Nullspace as Hyperplane} (Sol 2):
+		If $A = [\lambda_1 v \mid \dots \mid \lambda_n v]$ with $v \neq 0$:
+		$$ N(A) = \{x \in \R^n : \sum \lambda_i x_i = 0 \} $$
+		This is a hyperplane normal to vector $\lambda = (\lambda_1, \dots, \lambda_n)^\top$.
+		
+		\defn{Rank-1 Matrices} (Sol 7):
+		$A = uv^\top$.
+		* $\rank(A) = 1$.
+		* $C(A) = \text{Span}(u)$.
+		* $N(A) = \{x : v^\top x = 0\}$ (Hyperplane $\perp v$).
+		
+		\subsection*{2. Linear Functionals \& Maps}
+		\defn{Linear Functional} (Sol 3):
+		$T: \R^n \to \R$ is linear $\iff T(x) = a^\top x$ for some fixed $a$.
+		Example: $T(x) = \sum k x_k$ is linear.
+		Counter-example: $T(x) = \sum (x_k)^k$ is NOT linear for $n \ge 2$.
+		
+		\defn{Reflection Matrix} (Sol 7, 12):
+		Reflect $x$ across plane with normal $n$ ($\|n\|=1$):
+		$$ H = I - 2nn^\top $$
+		* Eigenvalues: $-1$ (mult 1, along $n$), $1$ (mult $n-1$, on plane).
+		* $H^2 = I$, $H^\top = H$.
+		
+		\subsection*{3. Determinants \& Block Matrices}
+		\defn{Block Determinant} (Sol 11):
+		$$ \det \begin{pmatrix} A & B \\ 0 & C \end{pmatrix} = \det(A)\det(C) $$
+		(Holds if $A, C$ are square).
+		
+		\defn{Vandermonde} (Sol 5):
+		Polynomial interpolation leads to Vandermonde matrix.
+		$\det(V) \neq 0$ if all $x_i$ distinct $\implies$ unique interpolating polynomial.
+		
+		\defn{Determinant of Sum}:
+		Generally $\det(A+B) \neq \det(A) + \det(B)$.
+		However, $\det(M+cI) = \prod (\lambda_i + c)$.
+		
+		\subsection*{4. Subspaces \& Functions}
+		\defn{Function Spaces} (Sol 6):
+		Space of functions $V = \{f: \R \to \R\}$.
+		* $E = \{f : f(-x) = f(x)\}$ (Even).
+		* $O = \{f : f(-x) = -f(x)\}$ (Odd).
+		* $V = E \oplus O$ (Direct sum).
+		* Any $f(x) = \frac{f(x)+f(-x)}{2} + \frac{f(x)-f(-x)}{2}$.
+		
+		\defn{Intersection of Planes} (Sol 7):
+		Intersection of 3 planes in $\R^3$ (system $Ax=0$).
+		* If $\rank(A)=3 \implies$ Point $\{0\}$.
+		* If $\rank(A)=2 \implies$ Line.
+		* If $\rank(A)=1 \implies$ Plane.
+		
+		\subsection*{5. Eigenvalues \& Similarity}
+		\defn{AB vs BA} (Sol 12):
+		$AB$ and $BA$ share the same \textbf{non-zero eigenvalues}.
+		If $ABv = \lambda v$ ($\lambda \neq 0$), then $Bv$ is eigenvector of $BA$.
+		Note: $AB$ and $BA$ may differ in eigenvalue $0$ multiplicities if dimensions differ.
+		
+		\defn{Nilpotent Matrices} (Sol 4):
+		$A^k = 0$.
+		* All $\lambda_i = 0$.
+		* $\det(A) = 0$, $\trace(A) = 0$.
+		* Not invertible.
+		* $I-A$ is invertible.
+		
+		\subsection*{6. Positive Definite Matrices}
+		(Sol 13)
+		\defn{Gram Matrix}: $G = A^\top A$ is always PSD.
+		$G$ is PD $\iff$ cols of $A$ are linearly independent.
+		
+		\defn{Sum of PD}:
+		If $A, B$ are PD (Positive Definite), then $A+B$ is PD.
+		Eigenvalues: $\lambda_{\min}(A+B) \ge \lambda_{\min}(A) + \lambda_{\min}(B)$.
+		
+		\subsection*{7. SVD \& Least Squares}
+		\defn{Min Norm Solution} (Sol 8/13):
+		For $Ax=b$, if infinite solutions:
+		$x_{LN} = A^\top (AA^\top)^{-1} b$ (if rows independent).
+		General: $x_{LN} = A^\dagger b$.
+		
+		\defn{Procrustes Problem} (Sol 13):
+		Find orthogonal $Q$ maximizing $\trace(Q^\top M)$.
+		Solution: Let $M = U\Sigma V^\top$. Then $Q = UV^\top$.
+		
+		\subsection*{8. Counter-Examples Checklist}
+		* $\rank(AB) \neq \rank(A)\rank(B)$.
+		* $A^2 = 0 \not\implies A=0$.
+		* $AB=0 \not\implies A=0$ or $B=0$.
+		* $A, B$ diagonalizable $\not\implies A+B$ diagonalizable.
+		* Orthogonal cols $\not\implies$ Orthogonal rows (unless square).
+		
+		\subsection*{9. Useful Formulas}
+		* \textbf{Rotation 2D}: $\begin{pmatrix} \cos \theta & -\sin \theta \\ \sin \theta & \cos \theta \end{pmatrix}$.
+		* \textbf{Cross Product Matrix}: $v \times x = [v]_\times x$.
+		$[v]_\times = \begin{pmatrix} 0 & -v_3 & v_2 \\ v_3 & 0 & -v_1 \\ -v_2 & v_1 & 0 \end{pmatrix}$ (Skew-symmetric).
+		* \textbf{Trace}: $\trace(A^\top B) = \sum A_{ij}B_{ij}$ (Dot product of matrices).
+		
+		\columnbreak
+		
+		% ================= HS23 EXAM SOLUTIONS =================
+		
+		\section*{HS23 Exam Solutions}
+		
+		\subsection*{Calculation 1a: LU Factorization (REMOVED)}
+		Note: LU factorization removed as not relevant for future exams.
+		
+		\subsection*{Calculation 1b: Vector Equations}
+		\textbf{Question}: Given $v + w = \begin{pmatrix} 4 \\ 5 \\ 6 \end{pmatrix}$, $v - w = \begin{pmatrix} 2 \\ 5 \\ 8 \end{pmatrix}$, and $v_3 - w_3 = c$. Find $v$, $w$, and $c$.
+		
+		\textbf{Solution}:
+		From $v_3 - w_3 = c$ and comparing with $v - w$: $c = 8$.
+		Adding the two equations: $2v = \begin{pmatrix} 6 \\ 10 \\ 14 \end{pmatrix}$, so $v = \begin{pmatrix} 3 \\ 5 \\ 7 \end{pmatrix}$.
+		Subtracting: $w = v - \begin{pmatrix} 2 \\ 5 \\ 8 \end{pmatrix} = \begin{pmatrix} 1 \\ 0 \\ -1 \end{pmatrix}$.
+		
+		\subsection*{Calculation 1c: Matrix Commutativity}
+		\textbf{Question}: Find $x$ such that $MN = NM$ where $M = \begin{pmatrix} 1 & 2 \\ 3 & 5 \end{pmatrix}$, $N = \begin{pmatrix} 4 & x \\ 3 & 4 \end{pmatrix}$.
+		
+		\textbf{Solution}:
+		$MN = \begin{pmatrix} 4+3x & 8+5x \\ 11 & 19 \end{pmatrix}$, $NM = \begin{pmatrix} 8 & 2x+12 \\ 11 & 3x+15 \end{pmatrix}$.
+		Equating $(1,2)$ entries: $8 + 5x = 2x + 12 \implies 3x = 4 \implies x = \frac{4}{3}$.
+		
+		\subsection*{Calculation 2a: Linear System}
+		\textbf{Question}: Solve the system where $u = \begin{pmatrix} 1 \\ 1 \\ 0 \end{pmatrix}$, $v = \begin{pmatrix} 0 \\ 1 \\ 1 \end{pmatrix}$, $w = \begin{pmatrix} 1 \\ 0 \\ 1 \end{pmatrix}$, and $u^\top x = v^\top x = w^\top x$ with $\sum x_i = 2$.
+		
+		\textbf{Solution}:
+		Let $c = u^\top x$. Then $3c = u^\top x + v^\top x + w^\top x = 2\sum x_i = 4$, so $c = \frac{4}{3}$.
+		Solving the system yields $x = \begin{pmatrix} 2/3 \\ 2/3 \\ 2/3 \end{pmatrix}$.
+		
+		\subsection*{Calculation 2b: Eigenvalue Condition}
+		\textbf{Question}: For $A = \begin{pmatrix} 1 & 3a \\ 1 & 2 \end{pmatrix}$, find smallest $a$ such that $A$ has a real eigenvalue.
+		
+		\textbf{Solution}:
+		$\det(A - \lambda I) = \lambda^2 - 3\lambda + 2 - 3a$.
+		Eigenvalues are $\lambda = \frac{3 \pm \sqrt{9 - 4(2-3a)}}{2}$.
+		Real eigenvalues exist when $9 - 8 + 12a \ge 0 \implies a \ge -\frac{1}{12}$.
+		
+		\subsection*{Calculation 2c: Projection}
+		\textbf{Question}: Given $Q = \begin{pmatrix} 1 & -1 \\ 0 & 1 \\ -1 & -1 \end{pmatrix}$, $b = \begin{pmatrix} 1 \\ 1 \\ 1 \end{pmatrix}$, find $p = \text{proj}_{C(Q)}(b)$ with $\|b - p\| = \sqrt{\frac{8}{3}}$.
+		
+		\textbf{Solution}:
+		$p = Q(Q^\top Q)^{-1}Q^\top b = \begin{pmatrix} 1 & -1 \\ 0 & 1 \\ -1 & -1 \end{pmatrix} \begin{pmatrix} 1/2 & 0 \\ 0 & 1/3 \end{pmatrix} \begin{pmatrix} 0 \\ -1 \end{pmatrix} = \begin{pmatrix} 1/3 \\ -1/3 \\ 1/3 \end{pmatrix}$.
+		
+		\subsection*{Proof 3a: Parallelogram Law}
+		\textbf{Statement}: $\|v+w\|^2 + \|v-w\|^2 = 2(\|v\|^2 + \|w\|^2)$.
+		
+		\textbf{Proof}:
+		$\|v+w\|^2 + \|v-w\|^2 = (v+w)^\top(v+w) + (v-w)^\top(v-w)$
+		$= v^\top v + 2v^\top w + w^\top w + v^\top v - 2v^\top w + w^\top w = 2v^\top v + 2w^\top w = 2(\|v\|^2 + \|w\|^2)$.
+		
+		\subsection*{Proof 3b: Skew-Symmetric Quadratic Form}
+		\textbf{Statement}: If $S = -S^\top$, then $x^\top Sx = 0$ for all $x$.
+		
+		\textbf{Proof}:
+		$x^\top Sx = x^\top(-S^\top)x = -(Sx)^\top x = -x^\top Sx$.
+		Therefore $2x^\top Sx = 0$, so $x^\top Sx = 0$.
+		
+		\subsection*{Proof 3c: Four Points in $\R^2$}
+		\textbf{Statement}: Any 4 points $u, v, w, z \in \R^2$ have scalars $c_u, c_v, c_w, c_z$ (not all zero) with $c_u u + c_v v + c_w w + c_z z = 0$ and $c_u + c_v + c_w + c_z = 0$.
+		
+		\textbf{Proof}:
+		Consider vectors in $\R^3$: $u' = \begin{pmatrix} u_1 \\ u_2 \\ 1 \end{pmatrix}$, etc.
+		Four vectors in $\R^3$ are linearly dependent, so $\exists$ non-trivial combination $c_u u' + c_v v' + c_w w' + c_z z' = 0$.
+		The third component gives $c_u + c_v + c_w + c_z = 0$.
+		The first two components give $c_u u + c_v v + c_w w + c_z z = 0$.
+		
+		\subsection*{Proof 4a: Linear Transformation}
+		\textbf{Question}: Show $f(x) = \sum_{k=1}^n k x_k$ is linear.
+		
+		\textbf{Proof}:
+		$f(x+y) = \sum k(x_k + y_k) = \sum kx_k + \sum ky_k = f(x) + f(y)$.
+		$f(cx) = \sum k(cx_k) = c\sum kx_k = cf(x)$.
+		
+		\subsection*{Proof 4b: Eigenvalue Positivity}
+		\textbf{Statement}: If $S, T$ are PD and $STv = \lambda v$, then $\lambda > 0$.
+		
+		\textbf{Proof}:
+		$Tv \neq 0$ (since $T$ invertible). By PD of $S$: $(Tv)^\top S(Tv) > 0$.
+		Multiply $STv = \lambda v$ by $(Tv)^\top$: $(Tv)^\top S(Tv) = \lambda v^\top Tv$.
+		Since $v^\top Tv > 0$ (PD) and $(Tv)^\top S(Tv) > 0$, we have $\lambda > 0$.
+		
+		\subsection*{Proof 4c: Inverse of Special Matrix}
+		\textbf{Question}: For $A = I + B$ where $B$ is $n \times n$ all-ones matrix, find $A^{-1}$.
+		
+		\textbf{Solution}:
+		Let $C = I - \frac{1}{n+1}B$. Then $AC = (I+B)(I - \frac{1}{n+1}B) = I + B - \frac{1}{n+1}B - \frac{n}{n+1}B = I$ (using $B^2 = nB$).
+		Therefore $A^{-1} = I - \frac{1}{n+1}B$.
+		
+		\subsection*{MC 1: Linear System Solutions}
+		\textbf{Question}: $A \in \R^{5 \times 6}$, $\rank(A) = 5$, $b \in \R^5$. Which is true?
+		
+		\textbf{Answer (c)}: Infinitely many solutions.
+		\textbf{Reason}: $\dim(C(A)) = 5 = \R^5$, so solvable. $\dim(N(A)) = 6-5 = 1$, so infinite solutions.
+		
+		\subsection*{MC 2: Rank-1 Matrix Properties}
+		\textbf{Question}: For $A = vw^\top$ ($v, w \neq 0$), which is true?
+		
+		\textbf{Answer (b)}: Largest singular value is $\sigma = \|v\|\|w\|$.
+		\textbf{Reason}: SVD: $A = \frac{v}{\|v\|}(\|v\|\|w\|)\left(\frac{w}{\|w\|}\right)^\top$, so only non-zero singular value is $\|v\|\|w\|$.
+		
+		\subsection*{MC 3: Nilpotent Matrices}
+		\textbf{Question}: Matrix $A$ is nilpotent if $A^k = 0$ for some $k$. Which is true?
+		
+		\textbf{Answer (c)}: $\rank(A) < n$.
+		\textbf{Reason}: Full rank matrices remain full rank under multiplication, so cannot be nilpotent.
+		
+		\subsection*{MC 4: PSD Properties}
+		\textbf{Question}: $A$ symmetric PSD. Which is true?
+		
+		\textbf{Answer (d)}: All diagonal entries are non-negative.
+		\textbf{Reason}: $A_{ii} = e_i^\top A e_i \ge 0$ by PSD definition.
+		
+		\subsection*{MC 5: Subspace Test}
+		\textbf{Question}: Which is NOT a subspace of $\R^n$?
+		
+		\textbf{Answer (b)}: $\{x : \sum x_i \ge 0\}$.
+		\textbf{Reason}: Not closed under scalar multiplication (e.g., $e_1$ is in the set but $-e_1$ is not).
+		
+		\subsection*{MC 6: Matrix Powers}
+		\textbf{Question}: $A = \begin{pmatrix} 3 & 2 \\ -4 & -3 \end{pmatrix}$ has eigenvalues 1 and -1. Find $A^{1024}$.
+		
+		\textbf{Answer (c)}: $A^{1024} = I$.
+		\textbf{Reason}: $A^2 = I$ can be verified directly, so $A^{1024} = (A^2)^{512} = I$.
+		
+	\end{multicols*}
+\end{document}
